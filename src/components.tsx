@@ -34,12 +34,7 @@ function useAnimatedElement<T extends SVGElement>({
     const element = elementRef.current
     let elementId = element.id
 
-    // Assign ID if element doesn't have one and has animations with triggers
-    const hasTriggers = Array.from(Object.values(animations)).some(
-      (anim) => anim.begin && typeof anim.begin !== 'string'
-    )
-
-    if (hasTriggers && !elementId) {
+    if (!elementId) {
       elementId = ensureElementId(element)
     }
 
