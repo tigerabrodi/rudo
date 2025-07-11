@@ -22,7 +22,12 @@ const EASING_MAP: EasingMap = {
   'cubic-bezier': '0.25 0.1 0.25 1', // Default, users should provide custom keySplines
 }
 
-// Convert easing name(s) to keySplines string
+/**
+ * Convert easing name(s) to keySplines string
+ * Example:
+ * easingToKeySplines('ease') // '0.25 0.1 0.25 1'
+ * easingToKeySplines(['ease', 'ease-in']) // '0.25 0.1 0.25 1; 0.42 0 1 1'
+ */
 function easingToKeySplines(easing: EasingType | EasingType[]): string {
   if (Array.isArray(easing)) {
     return easing.map((e) => EASING_MAP[e]).join('; ')
@@ -30,18 +35,24 @@ function easingToKeySplines(easing: EasingType | EasingType[]): string {
   return EASING_MAP[easing]
 }
 
-// Generate unique ID for animation elements
-let animationIdCounter = 0
-function generateAnimationId(): string {
-  return `smil-anim-${++animationIdCounter}`
-}
-
-// Validate animation configuration
-function validateAnimation(
-  property: string,
-  animation: AnimatedProperty,
+/**
+ * Validate animation configuration
+ * Example:
+ * validateAnimation({
+ *   property: 'x',
+ *   animation: { from: 0, to: 100, duration: '1s' },
+ *   element: 'rect'
+ * })
+ */
+function validateAnimation({
+  property,
+  animation,
+  element,
+}: {
+  property: string
+  animation: AnimatedProperty
   element: string
-): void {
+}): void {
   const { values, easing, keyTimes } = animation
 
   // If values array is provided, validate related arrays
@@ -117,28 +128,24 @@ function validateAnimation(
 }
 
 // Convert trigger to SMIL begin attribute value
-function triggerToBeginValue(
-  trigger: AnimationTrigger,
-  targetElementId?: string
-): string {
-  const { type, target } = trigger
+function triggerToBeginValue({
+  trigger,
+  targetElementId,
+}: {
+  trigger: AnimationTrigger
+  targetElementId: string
+}): string {
+  const { type } = trigger
 
   // If we have a target element with an ID, use it
-  if (targetElementId) {
-    return `${targetElementId}.${type}`
-  }
-
-  // For targets without ID, we'll need to assign one
-  // This is handled in the component layer
-  return `target-element.${type}`
+  return `${targetElementId}.${type}`
 }
 
 // Generate SMIL animate element
 export function generateSMILAnimation(config: SMILConfig): string {
   const { element, property, animation, elementId } = config
 
-  // Validate the animation
-  validateAnimation(property, animation, element)
+  validateAnimation({ property, animation, element })
 
   const {
     from,
@@ -155,11 +162,9 @@ export function generateSMILAnimation(config: SMILConfig): string {
     restart,
   } = animation
 
-  const animId = generateAnimationId()
-
   // Build SMIL attributes
   const attributes: string[] = [
-    `id="${animId}"`,
+    `id="${animation.id}"`,
     `attributeName="${property}"`,
     `dur="${duration}"`,
   ]
@@ -178,7 +183,10 @@ export function generateSMILAnimation(config: SMILConfig): string {
       attributes.push(`begin="${begin}"`)
     } else {
       // Handle trigger object
-      const beginValue = triggerToBeginValue(begin, elementId)
+      const beginValue = triggerToBeginValue({
+        trigger: begin,
+        targetElementId: elementId,
+      })
       attributes.push(`begin="${beginValue}"`)
     }
   }
@@ -231,7 +239,7 @@ export function generateElementAnimations({
 }: {
   element: string
   animations: AllAnimations
-  elementId?: string
+  elementId: string
 }): string[] {
   const animationElements: string[] = []
 
@@ -293,7 +301,6 @@ export function ensureElementId(element: HTMLElement | SVGElement): string {
 
 // Utility to check if browser supports SMIL
 export function supportsSMIL(): boolean {
-  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
   const animate = document.createElementNS(
     'http://www.w3.org/2000/svg',
     'animate'
