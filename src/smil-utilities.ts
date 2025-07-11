@@ -1,6 +1,7 @@
-// smil-utilities.ts
 import {
+  AllAnimations,
   AnimatedProperty,
+  AnimationElement,
   AnimationTrigger,
   AnimationValidationError,
   EasingMap,
@@ -223,17 +224,21 @@ export function generateSMILAnimation(config: SMILConfig): string {
 }
 
 // Generate all animations for an element
-export function generateElementAnimations(
-  element: string,
-  animations: Record<string, AnimatedProperty>,
+export function generateElementAnimations({
+  element,
+  animations,
+  elementId,
+}: {
+  element: string
+  animations: AllAnimations
   elementId?: string
-): string[] {
+}): string[] {
   const animationElements: string[] = []
 
   for (const [property, animation] of Object.entries(animations)) {
     try {
       const smilConfig: SMILConfig = {
-        element: element as any,
+        element: element as AnimationElement,
         property,
         animation,
         elementId,
@@ -259,9 +264,9 @@ export function generateElementAnimations(
 
 // Helper to extract trigger references from animations
 export function extractTriggerRefs(
-  animations: Record<string, AnimatedProperty>
-): Set<React.RefObject<any>> {
-  const triggerRefs = new Set<React.RefObject<any>>()
+  animations: AllAnimations
+): Set<React.RefObject<SVGElement | HTMLElement>> {
+  const triggerRefs = new Set<React.RefObject<SVGElement | HTMLElement>>()
 
   for (const animation of Object.values(animations)) {
     if (animation.begin && typeof animation.begin !== 'string') {
