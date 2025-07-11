@@ -40,6 +40,7 @@ export interface AnimatedProperty {
   duration: string
   begin?: string | AnimationTrigger
   keyTimes?: number[] // Must match values array length if provided
+  id: string // Require always passing id for now
 
   // Easing and interpolation
   easing?: EasingType | EasingType[] // Array length must match transitions count
@@ -125,7 +126,7 @@ export interface SMILConfig {
   element: AnimationElement
   property: string
   animation: AnimatedProperty
-  elementId?: string // For targeting specific elements
+  elementId: string
 }
 
 // Easing to keySplines mapping type
