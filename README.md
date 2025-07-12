@@ -4,7 +4,7 @@ A modern SMIL animation library for React. Write beautiful SVG animations withou
 
 ## ✨ Features
 
-- 🎯 **4 Animated SVG Components** -> Rect, Circle, Line, and Polyline with animation props
+- 🎯 **5 Animated SVG Components** -> Rect, Circle, Line, Polyline, and Path with fluent PathBuilder API
 - 🚀 **Native SMIL Power** -> Leverages browser's native SVG animation engine for smooth performance
 - 🎨 **9 Built-in Easings** -> From linear to bounce, with automatic keySplines conversion
 - 📦 **Type-Safe** -> Fully typed API with literal unions and ComponentProps inheritance
@@ -54,9 +54,60 @@ function AnimatedCard() {
 }
 ```
 
+## 🎨 Path Component & Fluent API
+
+The `Path` component includes a fluent `PathBuilder` API for creating complex SVG paths:
+
+```tsx
+import { Path } from '@tigerabrodioss/rudo'
+
+function AnimatedPath() {
+  return (
+    <svg viewBox="0 0 200 100">
+      <Path
+        stroke="blue"
+        fill="none"
+        strokeWidth={2}
+        animate={{
+          strokeDashoffset: {
+            id: 'draw',
+            from: 100,
+            to: 0,
+            duration: '2s',
+            easing: 'ease-in-out',
+          },
+        }}
+      >
+        {(path) =>
+          path
+            .moveTo({ x: 10, y: 10 })
+            .quadraticCurve({
+              control: { x: 50, y: 50 },
+              end: { x: 100, y: 10 },
+            })
+            .lineTo({ x: 150, y: 50 })
+            .close()
+        }
+      </Path>
+    </svg>
+  )
+}
+```
+
+### PathBuilder Methods
+
+- `moveTo({ x, y })` - Move to point
+- `lineTo({ x, y })` - Line to point
+- `quadraticCurve({ control, end })` - Quadratic Bézier curve
+- `cubicCurve({ control1, control2, end })` - Cubic Bézier curve
+- `arc({ rx, ry, rotation?, largeArc?, sweep?, end })` - Elliptical arc
+- `horizontalLine({ x })` - Horizontal line
+- `verticalLine({ y })` - Vertical line
+- `close()` - Close path
+
 ## 🎭 Components & Easings
 
-**Components:** `Rect` | `Circle` | `Line` | `Polyline`
+**Components:** `Rect` | `Circle` | `Line` | `Polyline` | `Path`
 
 **Easings:** `linear` | `ease` | `ease-in` | `ease-out` | `ease-in-out` | `bounce` | `elastic` | `back` | `cubic-bezier`
 
