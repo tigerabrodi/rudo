@@ -66,6 +66,17 @@ export interface RectAnimations {
   strokeWidth?: AnimatedProperty
 }
 
+export interface PathAnimations {
+  d?: AnimatedProperty // Path data animation
+  pathLength?: AnimatedProperty // For stroke animations
+  opacity?: AnimatedProperty
+  fill?: AnimatedProperty
+  stroke?: AnimatedProperty
+  strokeWidth?: AnimatedProperty
+  strokeDasharray?: AnimatedProperty
+  strokeDashoffset?: AnimatedProperty // Great for drawing animations
+}
+
 export interface CircleAnimations {
   cx?: AnimatedProperty
   cy?: AnimatedProperty
@@ -95,6 +106,10 @@ export interface PolylineAnimations {
 }
 
 // Component prop interfaces extending native SVG props
+export interface PathProps extends ComponentProps<'path'> {
+  animate?: PathAnimations
+}
+
 export interface RectProps extends ComponentProps<'rect'> {
   animate?: RectAnimations
 }
@@ -119,7 +134,7 @@ export class AnimationValidationError extends Error {
 }
 
 // Utility types for internal use
-export type AnimationElement = 'rect' | 'circle' | 'line' | 'polyline'
+export type AnimationElement = 'rect' | 'circle' | 'line' | 'polyline' | 'path'
 
 // Configuration for SMIL generation
 export interface SMILConfig {
@@ -138,3 +153,4 @@ export type AllAnimations =
   | CircleAnimations
   | LineAnimations
   | PolylineAnimations
+  | PathAnimations
