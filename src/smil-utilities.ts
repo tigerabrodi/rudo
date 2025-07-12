@@ -24,9 +24,11 @@ const EASING_MAP: EasingMap = {
 
 /**
  * Convert easing name(s) to keySplines string
- * Example:
+ * @example
+ * ```ts
  * easingToKeySplines('ease') // '0.25 0.1 0.25 1'
  * easingToKeySplines(['ease', 'ease-in']) // '0.25 0.1 0.25 1; 0.42 0 1 1'
+ * ```
  */
 function easingToKeySplines(easing: EasingType | EasingType[]): string {
   if (Array.isArray(easing)) {
@@ -37,12 +39,14 @@ function easingToKeySplines(easing: EasingType | EasingType[]): string {
 
 /**
  * Validate animation configuration
- * Example:
+ * @example
+ * ```ts
  * validateAnimation({
  *   property: 'x',
  *   animation: { from: 0, to: 100, duration: '1s' },
  *   element: 'rect'
  * })
+ * ```
  */
 function validateAnimation({
   property,
@@ -127,7 +131,19 @@ function validateAnimation({
   }
 }
 
-// Convert trigger to SMIL begin attribute value
+/**
+ * Convert trigger to SMIL begin attribute value
+ * @param trigger - The animation trigger configuration
+ * @param targetElementId - The ID of the target element
+ * @returns The SMIL begin attribute value
+ * @example
+ * ```ts
+ * triggerToBeginValue({
+ *   trigger: { type: 'click', target: buttonRef },
+ *   targetElementId: 'myButton'
+ * }) // 'myButton.click'
+ * ```
+ */
 function triggerToBeginValue({
   trigger,
   targetElementId,
@@ -141,7 +157,27 @@ function triggerToBeginValue({
   return `${targetElementId}.${type}`
 }
 
-// Generate SMIL animate element
+/**
+ * Generate SMIL animate element
+ * @param config - The SMIL animation configuration
+ * @returns The generated SMIL animate element as a string
+ * @example
+ * ```ts
+ * const smilElement = generateSMILAnimation({
+ *   element: 'rect',
+ *   property: 'x',
+ *   animation: {
+ *     id: 'move-x',
+ *     from: 0,
+ *     to: 100,
+ *     duration: '2s',
+ *     easing: 'ease-in-out'
+ *   },
+ *   elementId: 'myRect'
+ * })
+ * // '<animate id="move-x" attributeName="x" dur="2s" from="0" to="100" keySplines="0.42 0 0.58 1" calcMode="spline" />'
+ * ```
+ */
 export function generateSMILAnimation(config: SMILConfig): string {
   const { element, property, animation, elementId } = config
 
@@ -231,7 +267,25 @@ export function generateSMILAnimation(config: SMILConfig): string {
   return `<animate ${attributes.join(' ')} />`
 }
 
-// Generate all animations for an element
+/**
+ * Generate all animations for an element
+ * @param element - The SVG element type
+ * @param animations - All animations configuration for the element
+ * @param elementId - The ID of the element
+ * @returns Array of SMIL animation elements as strings
+ * @example
+ * ```ts
+ * const animations = generateElementAnimations({
+ *   element: 'rect',
+ *   animations: {
+ *     x: { id: 'move-x', from: 0, to: 100, duration: '2s' },
+ *     y: { id: 'move-y', from: 0, to: 50, duration: '1s' }
+ *   },
+ *   elementId: 'myRect'
+ * })
+ * // ['<animate id="move-x" attributeName="x" dur="2s" from="0" to="100" />', '<animate id="move-y" attributeName="y" dur="1s" from="0" to="50" />']
+ * ```
+ */
 export function generateElementAnimations({
   element,
   animations,
@@ -270,7 +324,26 @@ export function generateElementAnimations({
   return animationElements
 }
 
-// Helper to extract trigger references from animations
+/**
+ * Helper to extract trigger references from animations
+ * @param animations - All animations configuration
+ * @returns Set of React refs used as animation triggers
+ * @example
+ * ```ts
+ * const buttonRef = useRef<HTMLButtonElement>(null)
+ * const animations = {
+ *   x: {
+ *     id: 'move-x',
+ *     from: 0,
+ *     to: 100,
+ *     duration: '2s',
+ *     begin: { type: 'click', target: buttonRef }
+ *   }
+ * }
+ * const triggerRefs = extractTriggerRefs(animations)
+ * // Set containing buttonRef
+ * ```
+ */
 export function extractTriggerRefs(
   animations: AllAnimations
 ): Set<React.RefObject<SVGElement | HTMLElement>> {
@@ -285,7 +358,18 @@ export function extractTriggerRefs(
   return triggerRefs
 }
 
-// Helper to assign IDs to trigger target elements
+/**
+ * Helper to assign IDs to trigger target elements
+ * @param element - The HTML or SVG element to ensure has an ID
+ * @returns The element's ID (existing or newly generated)
+ * @example
+ * ```ts
+ * const buttonElement = document.querySelector('button')
+ * const elementId = ensureElementId(buttonElement)
+ * // If button had id="myButton", returns "myButton"
+ * // If button had no id, generates and assigns unique ID like "smil-trigger-1640995200000-abc123def"
+ * ```
+ */
 export function ensureElementId(element: HTMLElement | SVGElement): string {
   if (element.id) {
     return element.id
@@ -299,7 +383,20 @@ export function ensureElementId(element: HTMLElement | SVGElement): string {
   return id
 }
 
-// Utility to check if browser supports SMIL
+/**
+ * Utility to check if browser supports SMIL
+ * @returns True if the browser supports SMIL animations, false otherwise
+ * @example
+ * ```ts
+ * if (supportsSMIL()) {
+ *   console.log('Browser supports SMIL animations')
+ *   // Proceed with SMIL animations
+ * } else {
+ *   console.log('Browser does not support SMIL, use fallback')
+ *   // Use CSS animations or other fallback
+ * }
+ * ```
+ */
 export function supportsSMIL(): boolean {
   const animate = document.createElementNS(
     'http://www.w3.org/2000/svg',
